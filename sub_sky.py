@@ -13,7 +13,6 @@
 #   2017-11-01 Initial version
 
 def median(sky_file, img_file, mask_limit, cut_ch=300):
-
     from astropy.io import fits
     import numpy as np
     import matplotlib.pyplot as plt
