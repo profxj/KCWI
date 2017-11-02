@@ -88,23 +88,20 @@ def median(sky_file, img_file, mask_limit, cut_ch=300):
 # This function is used to subtract PSF for bright point source
 #
 # INPUT:     - img_file      default 'img.fits'
-#            - px            peak x
-#            - py            peak y
 #            - dpx           cut PSF region in x
 #            - dpy           cut PSF region in y
 #
 # INPUT EXAMPLE:
-#   psf('img.fits', px=14, py=41, dpx=8, dpy=10)
+#   psf('img.fits', dpx=8, dpy=10)
 #
 # MODIFICATION HISTORY:
 #   Written by: Qiong Li
 #   2017-11-01 Initial version
 
-def psf(img_file, px, py, dpx, dpy):
+def psf(img_file, dpx, dpy):
     from astropy.io import fits
     import numpy as np
     import matplotlib.pyplot as plt
-    import zap
     import matplotlib as mpl
     img, ih = fits.getdata(img_file, header=True)
 
@@ -113,6 +110,13 @@ def psf(img_file, px, py, dpx, dpy):
     for x in np.arange(0, len(img[1,:,1]), 1):
         for y in np.arange(0, len(img[1,1,:]), 1):
             img_median[x,y] = np.median(img[:,x,y])
+            
+    # find peak location
+    peak = np.max(img_median)
+    loc = np.where(img_median == peak)
+    px=loc[1][0]  # add[0]: Error only integer scalar arrays can be converted to a scalar index
+    py=loc[0][0]
+    
     #################### test peak
     #face = plt.imshow(img_median, aspect='equal', interpolation='None',origin='lower',cmap = mpl.cm.gray)
     #cbar = plt.colorbar(face)
@@ -120,7 +124,7 @@ def psf(img_file, px, py, dpx, dpy):
     #plt.show()
     ####################
 
-    a = np.zeros(img[:,1,1].shape)
+    a = np.zeros(img[:,1,1].shape) # scale value
     psf = np.zeros(img.shape)
 
     # scale to each channel
